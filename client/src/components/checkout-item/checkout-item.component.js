@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { clearItemFromCart, addItem, removeItem } from '../../redux/cart/cart.actions';
+import { selectCartItems } from '../../redux/cart/cart.selectors';
 
 import './checkout-item.styles.scss';
 
@@ -23,6 +24,12 @@ function CheckoutItem({ cartItem, cartItem:{ name, imageUrl, quantity, price }, 
     )
 }
 
+function mapStateToProps(state) {
+    return {
+        cartItems: selectCartItems(state)
+    }
+}
+
 function mapDispatchToProps(dispatch) {
     return {
         clearItem: item => dispatch(clearItemFromCart(item)),
@@ -31,4 +38,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(CheckoutItem);
+export default connect(mapStateToProps, mapDispatchToProps)(CheckoutItem);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { withRouter } from 'react-router-dom';
@@ -6,11 +6,17 @@ import { withRouter } from 'react-router-dom';
 import CustomButton from '../custom-button/custom-button.component';
 import CartItem from '../cart-item/cart-item.component';
 import { toggleCartHidden } from '../../redux/cart/cart.actions';
+import { updateUserCartStart } from '../../redux/user/user.actions';
 import { selectCartHidden, selectCartItems } from '../../redux/cart/cart.selectors';
+import { selectCurrentUser } from '../../redux/user/user.selectors';
 
 import './cart-dropdown.styles.scss';
 
-function CartDropdown({ hidden, cartItems, history, dispatch }) {
+function CartDropdown({ hidden, cartItems, history, currentUser, updateUserCartStart, toggleCartHidden }) {
+
+    useEffect(() => {
+        updateUserCartStart(currentUser, cartItems);
+    }, [cartItems, currentUser])
 
     const cartDropdownStyles = {
         display: hidden ? 'none' : 'flex'
@@ -30,19 +36,27 @@ function CartDropdown({ hidden, cartItems, history, dispatch }) {
             }</div>
             <CustomButton onClick={() => {
                 history.push('/checkout');
-                dispatch(toggleCartHidden());
+                toggleCartHidden();
             }}>Go to checkout</CustomButton>
         </div>
     )
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        updateUserCartStart: (user, cartItems) => dispatch(updateUserCartStart(user, cartItems)) ,
+        toggleCartHidden: () => dispatch(toggleCartHidden())
+    }
 }
 
 function mapStateToProps() {
     return (
         createStructuredSelector({
             hidden: selectCartHidden,
-            cartItems: selectCartItems
+            cartItems: selectCartItems,
+            currentUser: selectCurrentUser
         })
     )
 }
 
-export default withRouter(connect(mapStateToProps)(CartDropdown));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CartDropdown));

@@ -1,7 +1,7 @@
-import { takeLatest, put, call, all } from 'redux-saga/effects';
+import { takeLatest, put, all } from 'redux-saga/effects';
 
-import { createUserProfileDocument, auth, googleProvider, getCurrentUser } from '../../firebase/firebase.utils';
-import { signInFailure, signInSuccess, signOutSuccess, signOutFailure, signUpSuccess, signUpFailure } from './user.actions';
+import { createUserProfileDocument, updateUserDocumentWithNewCart, auth, googleProvider, getCurrentUser } from '../../firebase/firebase.utils';
+import { signInFailure, signInSuccess, signOutSuccess, signOutFailure, signUpSuccess, signUpFailure, updateUserCartFailure, updateUserCartSuccess } from './user.actions';
 import userActionTypes from './user.types';
 
 function* isUserAuthorized() {
@@ -21,10 +21,10 @@ function* userSessionCheckWatch() {
     )
 }
 
-function* signUp({ payload: { email, password, displayName } }) {
+function* signUp({ payload: { email, password, displayName, cart } }) {
     try {
         const { user: userAuth } = yield auth.createUserWithEmailAndPassword(email, password);
-        yield put(signUpSuccess({ userAuth, additionalData: { displayName } }));
+        yield put(signUpSuccess({ userAuth, additionalData: { displayName, cart } }));
     } catch(err) {
         yield put(signUpFailure(err.message))
     }
@@ -49,7 +49,7 @@ function* signUpSuccessWatch() {
 }
 
 function* updateCurrentUserWithAuth(userAuth, additionalData) {
-    const userRef = yield call(createUserProfileDocument, userAuth, additionalData);
+    const userRef = yield createUserProfileDocument(userAuth, additionalData);
     const userSnapshot = yield userRef.get();
     yield put(signInSuccess({
         id: userAuth.uid,
@@ -60,7 +60,7 @@ function* updateCurrentUserWithAuth(userAuth, additionalData) {
 function* signInWithGoogle() {
     try {
         const { user: userAuth } = yield auth.signInWithPopup(googleProvider);
-        yield updateCurrentUserWithAuth(userAuth);
+        yield updateCurrentUserWithAuth(userAuth, );
     } catch(err) {
         yield put(signInFailure(err.message))
     }
@@ -105,6 +105,23 @@ function* signOutWatch() {
     )
 }
 
+export function* updateUserCartWatch() {
+    yield takeLatest(
+        userActionTypes.UPDATE_USER_CART_START,
+        updateUserCart
+    )
+}
+
+export function* updateUserCart({ payload: { user, cart } }) {
+    try {
+        yield updateUserDocumentWithNewCart(user, cart);
+        yield put(updateUserCartSuccess());
+    } catch (error) {
+        yield put(updateUserCartFailure(error.message));
+        console.info(error.message);
+    }
+}
+
 export default function* userRootSaga() {
     yield all([
         signUpStartWatch(),
@@ -112,6 +129,7 @@ export default function* userRootSaga() {
         googleSignInWatch(),
         emailSignInWatch(),
         userSessionCheckWatch(),
-        signOutWatch()
+        signOutWatch(),
+        updateUserCartWatch()
     ])
 }

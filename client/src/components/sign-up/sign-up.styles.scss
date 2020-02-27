@@ -3,7 +3,29 @@
   flex-direction: column;
   width: 380px;
 
+  @media screen and (max-width: 700px) {
+    width: unset;
+  }
+
   .title {
     margin: 10px 0;
+
+    @media screen and (max-width: 700px) {
+      font-size: 30px;
+    }
   }
+
+  .sub-title {
+    @media screen and (max-width: 700px) {
+      font-size: 20px;
+    }
+  }
+
+  button {
+    @media screen and (max-width: 700px) {
+      margin-left: auto;
+      width: 160px;
+    }
+  }
+
 }

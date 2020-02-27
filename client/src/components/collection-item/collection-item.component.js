@@ -9,6 +9,7 @@ import './collection-item.styles.scss';
 
 function CollectionItem({ item, addItem }) {
     const { name, imageUrl, price } = item;
+
     return(
         <div className="collection-item">
             <div 

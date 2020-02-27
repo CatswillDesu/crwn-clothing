@@ -1,18 +1,20 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect, Fragment, lazy, Suspense } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { checkUserSession } from './redux/user/user.actions';
 import { selectCurrentUser } from './redux/user/user.selectors'
 
-import SignInAndSignUp from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component'
-import Homepage from './pages/homepage/homepage.component';
-import ShopPage from './pages/shop/shop.component';
-import CheckoutPage from './pages/checkout/checkout.component';
-
 import Header from './components/header/header.component'
+import Spinner from './components/spinner/spinner.component';
+import ErrorBoundary from './components/error-boundary/error-boundary.component';
 
-import './App.css';
+import './App.scss';
+
+const Homepage = lazy(() => import('./pages/homepage/homepage.component'));
+const ShopPage = lazy(() => import('./pages/shop/shop.component'));
+const SignInAndSignUp = lazy(() => import('./pages/sign-in-and-sign-up/sign-in-and-sign-up.component'));
+const CheckoutPage = lazy(() => import('./pages/checkout/checkout.component'));
 
 function App({ checkUserSession, currentUser }) {
   useEffect(() => {
@@ -23,10 +25,14 @@ function App({ checkUserSession, currentUser }) {
     <Fragment>
       <Header />
       <Switch>
-        <Route exact path="/" component={Homepage} />
-        <Route path="/shop" component={ShopPage}/>
-        <Route exact path="/checkout" component={CheckoutPage}/>
-        <Route exact path="/sign-in"  render={() => currentUser ? (<Redirect to="/" />) : (<SignInAndSignUp />) } />
+        <ErrorBoundary>
+          <Suspense fallback={<Spinner/>} >
+            <Route exact path="/" component={Homepage} />
+            <Route path="/shop" component={ShopPage}/>
+            <Route exact path="/checkout" component={CheckoutPage}/>
+            <Route exact path="/sign-in"  render={() => currentUser ? (<Redirect to="/" />) : (<SignInAndSignUp />) } />
+          </Suspense>
+        </ErrorBoundary>
       </Switch>
     </Fragment>
   )

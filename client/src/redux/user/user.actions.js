@@ -73,6 +73,26 @@ export function signOutFailure(errMessage) {
     }
 }
 
+export function updateUserCartStart(user, cart) {
+    return {
+        type: userActionTypes.UPDATE_USER_CART_START,
+        payload: { user, cart }
+    }
+}
+
+export function updateUserCartSuccess() {
+    return {
+        type: userActionTypes.UPDATE_USER_CART_SUCCESS
+    }
+}
+
+export function updateUserCartFailure(error) {
+    return {
+        type: userActionTypes.UPDATE_USER_CART_FAILURE,
+        payload: error
+    }
+}
+
 export function removeError() {
     return {
         type: userActionTypes.REMOVE_ERROR

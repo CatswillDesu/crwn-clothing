@@ -34,6 +34,11 @@ function userReducer(state = INITIAL_STATE, action) {
                 ...state,
                 error: action.payload
             }
+        case userActionTypes.UPDATE_USER_CART_FAILURE:
+            return {
+                ...state,
+                error: action.payload
+            }
         case userActionTypes.REMOVE_ERROR:
             return {
                 ...state,

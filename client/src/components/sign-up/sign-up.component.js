@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
 import { signUpStart } from '../../redux/user/user.actions';
+import { selectCartItems } from '../../redux/cart/cart.selectors';
 
 import FormInput from '../form-input/form-input.component';
 import CustomButton from '../custom-button/custom-button.component';
 
 import './sign-up.styles.scss';
 
-function SignUp({ signUpStart, onSignUpWaiting }) {
+function SignUp({ signUpStart, onSignUpWaiting, cartItems }) {
 
     const [ userCredentials, setCredentials ] = useState({
         displayName: '',
@@ -25,7 +26,7 @@ function SignUp({ signUpStart, onSignUpWaiting }) {
             return;
         }
 
-        signUpStart({ displayName, email, password });
+        signUpStart({ displayName, email, password, cart: cartItems });
 
         setCredentials({
             displayName: '',
@@ -45,7 +46,7 @@ function SignUp({ signUpStart, onSignUpWaiting }) {
     return(
         <div className="sign-up">
             <h2 className="title">A do not have an account yet</h2>
-            <span>Sign up with your email and password</span>
+            <span className="sub-title">Sign up with your email and password</span>
             <form className="sign-up-form">
                 <FormInput 
                     type="text"
@@ -86,10 +87,16 @@ function SignUp({ signUpStart, onSignUpWaiting }) {
     )
 }
 
+function mapStateToProps(state) {
+    return {
+        cartItems: selectCartItems(state)
+    }
+}
+
 function mapDispatchToProps(dispatch) {
     return {
         signUpStart: userData => dispatch(signUpStart(userData))
     }
 }
 
-export default connect(null, mapDispatchToProps)(SignUp);
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

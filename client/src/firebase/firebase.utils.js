@@ -48,11 +48,24 @@ export async function addCollectionAndDocuments(collectionKey, objectsToAdd) {
     const batch = firestore.batch();
 
     objectsToAdd.forEach(obj => {
-          const newDocRef = collectionRef.doc();
-          batch.set(newDocRef, obj) ;
+        const newDocRef = collectionRef.doc();
+        batch.set(newDocRef, obj) ;
     })
 
     return await batch.commit();
+}
+
+export async function updateUserDocumentWithNewCart(userAuth, newCart) {
+    if (!userAuth) return;
+
+    const userRef = firestore.doc(`users/${userAuth.id}`);
+
+    try {
+        await userRef.update({ cart: newCart })
+    } catch(err) {
+        console.info('Error while updating user cart!', err.message);
+        throw err;
+    }
 }
 
 export async function convertCollectionSnapshotToMap(collectionRef) {

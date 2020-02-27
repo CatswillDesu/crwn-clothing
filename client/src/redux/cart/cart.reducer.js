@@ -1,4 +1,4 @@
-import { cartActionTypes } from './cart.types';
+import cartActionTypes from './cart.types';
 import { addItemToCart, removeItemFromCart } from './cart.utils';
 
 const INITIAL_STATE = {
@@ -38,4 +38,5 @@ function cartReducer(state = INITIAL_STATE, action) {
     }
 }
 
+export { INITIAL_STATE };
 export default cartReducer;
